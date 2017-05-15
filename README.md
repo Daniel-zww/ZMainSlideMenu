@@ -6,6 +6,10 @@ iOS view controller, shows left and right views by pressing button or gesture.
 
 <img src="https://github.com/Daniel-zww/ZImageResources/blob/master/ZMainSlideMenu/1.png?raw=true" width="285" height="500"/> <img src="https://github.com/Daniel-zww/ZImageResources/blob/master/ZMainSlideMenu/2.png?raw=true" width="285" height="500"/>
 
+### Pod
+
+pod 'ZMainSlideMenu'
+
 ### With source code
 
 ```swift
