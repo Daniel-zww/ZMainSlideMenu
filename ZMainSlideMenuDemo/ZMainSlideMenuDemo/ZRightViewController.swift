@@ -16,7 +16,7 @@ class ZRightViewController: UIViewController {
         // Do any additional setup after loading the view.
         
         let btnEvent = UIButton(type: UIButtonType.custom)
-        btnEvent.frame = CGRect(x: 20, y: 200, width: 100, height: 35)
+        btnEvent.frame = CGRect(x: 120, y: 200, width: 100, height: 35)
         btnEvent.setTitle("京东商城", for: UIControlState.normal)
         btnEvent.setTitleColor(UIColor.blue, for: UIControlState.normal)
         btnEvent.addTarget(self, action: #selector(btnEventClick), for: UIControlEvents.touchUpInside)

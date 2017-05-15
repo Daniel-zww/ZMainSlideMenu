@@ -46,7 +46,6 @@ class ZMainSlideMenu: UIViewController, UIGestureRecognizerDelegate {
     
     required init(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)!
-        fatalError("NSCoding not supported")
     }
     override init(nibName nibNameOrNil: String!, bundle nibBundleOrNil: Bundle!) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
@@ -111,6 +110,10 @@ class ZMainSlideMenu: UIViewController, UIGestureRecognizerDelegate {
         self.rightVC?.didMove(toParentViewController: self)
     }
     //显示主视图
+    public func showRootViewControllerAnimated(animated: Bool) {
+        self.showRootViewControllerAnimated(animated: animated, completionBlick: nil)
+    }
+    //显示主视图
     public func showRootViewControllerAnimated(animated: Bool, completionBlick: ((_ finished: Bool) -> Void)?) {
         if let rootVC = self.rootVC {
             weak var weakSelf = self
@@ -126,22 +129,6 @@ class ZMainSlideMenu: UIViewController, UIGestureRecognizerDelegate {
                 if completionBlick != nil {
                     completionBlick!(finished)
                 }
-            })
-        }
-    }
-    //显示主视图
-    public func showRootViewControllerAnimated(animated: Bool) {
-        if let rootVC = self.rootVC {
-            weak var weakSelf = self
-            UIView.animate(withDuration: self.animationDurationAnimated(animated: animated), animations: {
-                var frame = rootVC.view.frame
-                frame.origin.x = 0
-                rootVC.view.frame = frame
-                weakSelf?.updateLeftMenuFrame()
-                weakSelf?.updateRightMenuFrame()
-                weakSelf?.coverView?.alpha = 0
-            }, completion: { (finished) in
-                weakSelf?.coverView?.isHidden = true
             })
         }
     }

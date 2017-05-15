@@ -42,8 +42,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             let leftVC = self.getVCWithIdentifier(identifier: "SD_LeftVC_ID")
             slideMenuVC.setLeftViewController(leftViewController: leftVC)
             
-            //let rightVC = self.getVCWithIdentifier(identifier: "SD_RightVC_ID")
-            //slideMenuVC.setRightViewController(rightViewController: rightVC)
+            let rightVC = self.getVCWithIdentifier(identifier: "SD_RightVC_ID")
+            slideMenuVC.setRightViewController(rightViewController: rightVC)
         }
         self.slideMenuVC = slideMenuVC
         
