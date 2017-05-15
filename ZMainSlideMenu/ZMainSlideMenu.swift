@@ -19,11 +19,11 @@ class ZMainSlideMenu: UIViewController, UIGestureRecognizerDelegate {
     // MARK: - PublicAttribute
     
     /// 主视图
-    public var rootVC: UIViewController? = nil
+    public var rootVC: UIViewController?
     /// 左侧视图
-    public var leftVC: UIViewController? = nil
+    public var leftVC: UIViewController?
     /// 右侧视图
-    public var rightVC: UIViewController? = nil
+    public var rightVC: UIViewController?
     /// 菜单宽度
     public var menuWidth: CGFloat {
         return kMenuWidthScale * self.view.bounds.size.width
@@ -38,9 +38,9 @@ class ZMainSlideMenu: UIViewController, UIGestureRecognizerDelegate {
     /// 原始坐标
     private var originalPoint: CGPoint = CGPoint.zero
     /// 遮罩View
-    private var coverView: UIView? = nil
+    private var coverView: UIView?
     /// 拖拽手势
-    private var pan: UIPanGestureRecognizer? = nil
+    private var pan: UIPanGestureRecognizer?
     
     // MARK: - SuperMethod
     
@@ -53,10 +53,7 @@ class ZMainSlideMenu: UIViewController, UIGestureRecognizerDelegate {
     }
     convenience init(rootViewController: UIViewController) {
         self.init(nibName: nil, bundle: nil)
-        self.rootVC = rootViewController
-        self.addChildViewController(self.rootVC!)
-        self.view.addSubview(self.rootVC!.view)
-        self.rootVC?.didMove(toParentViewController: self)
+        self.setRootViewController(rootViewController: rootViewController)
     }
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -92,28 +89,48 @@ class ZMainSlideMenu: UIViewController, UIGestureRecognizerDelegate {
     override var shouldAutorotate: Bool {
         return false
     }
-    // MARK: - PraviteMethod
     
-    private func setLeftViewController(leftViewController: UIViewController) {
+    // MARK: - PublicMethod
+    
+    public func setRootViewController(rootViewController: UIViewController) {
+        self.rootVC = rootViewController
+        self.addChildViewController(self.rootVC!)
+        self.view.addSubview(self.rootVC!.view)
+        self.rootVC?.didMove(toParentViewController: self)
+    }
+    public func setLeftViewController(leftViewController: UIViewController) {
         self.leftVC = leftViewController
         self.addChildViewController(self.leftVC!)
         self.view.insertSubview(self.leftVC!.view, at: 0)
         self.leftVC?.didMove(toParentViewController: self)
     }
-    private func setRightViewController(rightViewController: UIViewController) {
+    public func setRightViewController(rightViewController: UIViewController) {
         self.rightVC = rightViewController
         self.addChildViewController(self.rightVC!)
         self.view.insertSubview(self.rightVC!.view, at: 0)
         self.rightVC?.didMove(toParentViewController: self)
     }
-    private func setSlideEnabled(slideEnabled: Bool) {
-        self.pan?.isEnabled = slideEnabled
-    }
-    private func slideEnabled() -> Bool {
-        return self.pan == nil ? false : self.pan!.isEnabled
+    //显示主视图
+    public func showRootViewControllerAnimated(animated: Bool, completionBlick: ((_ finished: Bool) -> Void)?) {
+        if let rootVC = self.rootVC {
+            weak var weakSelf = self
+            UIView.animate(withDuration: self.animationDurationAnimated(animated: animated), animations: {
+                var frame = rootVC.view.frame
+                frame.origin.x = 0
+                rootVC.view.frame = frame
+                weakSelf?.updateLeftMenuFrame()
+                weakSelf?.updateRightMenuFrame()
+                weakSelf?.coverView?.alpha = 0
+            }, completion: { (finished) in
+                weakSelf?.coverView?.isHidden = true
+                if completionBlick != nil {
+                    completionBlick!(finished)
+                }
+            })
+        }
     }
     //显示主视图
-    private func showRootViewControllerAnimated(animated: Bool) {
+    public func showRootViewControllerAnimated(animated: Bool) {
         if let rootVC = self.rootVC {
             weak var weakSelf = self
             UIView.animate(withDuration: self.animationDurationAnimated(animated: animated), animations: {
@@ -129,7 +146,7 @@ class ZMainSlideMenu: UIViewController, UIGestureRecognizerDelegate {
         }
     }
     //显示左侧菜单
-    private func showLeftViewControllerAnimated(animated: Bool) {
+    public func showLeftViewControllerAnimated(animated: Bool) {
         if let leftVC = self.leftVC, let rootVC = self.rootVC {
             self.coverView?.isHidden = false
             if let rightVC = self.rightVC {
@@ -145,7 +162,7 @@ class ZMainSlideMenu: UIViewController, UIGestureRecognizerDelegate {
         }
     }
     //显示右侧菜单
-    private func showRightViewControllerAnimated(animated: Bool) {
+    public func showRightViewControllerAnimated(animated: Bool) {
         if let rightVC = self.rightVC, let rootVC = self.rootVC {
             self.coverView?.isHidden = false
             if let leftVC = self.leftVC {
@@ -160,6 +177,9 @@ class ZMainSlideMenu: UIViewController, UIGestureRecognizerDelegate {
             })
         }
     }
+    
+    // MARK: - PraviteMethod
+    
     //改变左侧菜单位置
     private func updateLeftMenuFrame() {
         if let leftVC = self.leftVC, let rootVC = self.rootVC {
@@ -213,14 +233,37 @@ class ZMainSlideMenu: UIViewController, UIGestureRecognizerDelegate {
         if let rootVC = self.rootVC {
             //移动主控制器
             rootVC.view.center = CGPoint(x: (self.originalPoint.x + translation.x), y: self.originalPoint.y)
-            if self.rightVC != nil && rootVC.view.frame.minX <= 0 {
+            if self.rightVC == nil && rootVC.view.frame.minX <= 0 {
                 rootVC.view.frame = self.view.bounds
             }
-            if self.leftVC != nil && rootVC.view.frame.minX >= 0 {
+            if self.leftVC == nil && rootVC.view.frame.minX >= 0 {
                 rootVC.view.frame = self.view.bounds
             }
             //滑动到边缘位置后不可以继续滑动
-            
+            if rootVC.view.frame.minX > self.menuWidth {
+                let centerX = rootVC.view.bounds.size.width / 2 + self.menuWidth
+                rootVC.view.center = CGPoint(x: centerX, y: rootVC.view.center.y)
+            }
+            if rootVC.view.frame.maxX < self.emptyWidth {
+                let centerX = rootVC.view.bounds.size.width / 2 - self.menuWidth
+                rootVC.view.center = CGPoint(x: centerX, y: rootVC.view.center.y)
+            }
+            //判断显示左菜单还是右菜单
+            if rootVC.view.frame.minX > 0 {
+                if let rightVC = self.rightVC {
+                    self.view.sendSubview(toBack: rightVC.view)
+                }
+                self.updateLeftMenuFrame()
+                self.coverView?.isHidden = false
+                self.coverView?.alpha = rootVC.view.frame.minX / self.menuWidth * kMaxCoverAlpha
+            } else if rootVC.view.frame.minX < 0 {
+                if let leftVC = self.leftVC {
+                    self.view.sendSubview(toBack: leftVC.view)
+                }
+                self.updateRightMenuFrame()
+                self.coverView?.isHidden = false
+                self.coverView?.alpha = (self.view.frame.maxX - rootVC.view.frame.maxX) / self.menuWidth * kMaxCoverAlpha
+            }
         }
     }
     
