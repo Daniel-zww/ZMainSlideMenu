@@ -8,7 +8,9 @@ iOS view controller, shows left and right views by pressing button or gesture.
 
 ### Pod
 
+```swift
 pod 'ZMainSlideMenu'
+```
 
 ### With source code
 
