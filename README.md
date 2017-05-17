@@ -1,5 +1,9 @@
 # ZMainSlideMenu
 
+[![Version](https://img.shields.io/cocoapods/v/ZMainSlideMenu.svg?style=flat)](http://cocoapods.org/pods/ZMainSlideMenu)
+[![License](https://img.shields.io/cocoapods/l/ZMainSlideMenu.svg?style=flat)](http://cocoapods.org/pods/ZMainSlideMenu)
+[![Platform](https://img.shields.io/cocoapods/p/ZMainSlideMenu.svg?style=flat)](http://cocoapods.org/pods/ZMainSlideMenu)
+
 iOS view controller, shows left and right views by pressing button or gesture.
 
 ## Preview
